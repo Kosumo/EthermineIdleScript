@@ -6,33 +6,35 @@ IniRead, MemClock, config.ini, Overclock, MemClockOffset
 IniRead, PowerTarget, config.ini, Overclock, Powertarget
 IniRead, MineShortcut, config.ini, Shortcuts, Shortcut
 
-TimeAfkMin = %TimeAfk%*60000 ;Determines time in minutes
+TimeAfkMin := (TimeAfk*60000) ;Determines time in minutes
 highgpuclock = -setBaseClockOffset:0,0,%GpuClock% -setMemoryClockOffset:0,0,%MemClock% -setpowertarget:0,%PowerTarget% -forcepstate:0,2
 defaultgpuclock = -setBaseClockOffset:0,0,0 -setMemoryClockOffset:0,0,0
 
 Loop{
 	IfWinExist, Ethermine
 	{
-		SetWorkingDir %NvidiaInspectorLocation%
-		Run nvidiaInspector.exe %highgpuclock%
-		TrayTip, GpuOverclock, Overclocked, 4
+		Run %NvidiaInspectorLocation%\nvidiaInspector.exe %highgpuclock%
+		TrayTip, GpuOverclock, Overclocked
 		WinWaitClose, Ethermine
+		Run %NvidiaInspectorLocation%\nvidiaInspector.exe %defaultgpuclock%
+		Traytip, GpuOverclock, Default
 	}
 	IfWinNotExist, Ethermine
 	{
-		SetWorkingDir %NvidiaInspectorLocation%
-		Run nvidiaInspector.exe %defaultgpuclock%
-		Traytip, GpuOverclock, Default, 4
-		WinWaitActive, Ethermine
-		if A_TimeIdlePhysical > %TimeAfk%
-		{
-			SetWorkingDir %MineScriptLocation%
-			Run start.bat
-		}
+			if A_TimeIdlePhysical > %TimeAfkMin%
+			{
+				SetWorkingDir, %MineScriptLocation%
+				Run %MineScriptLocation%\start.bat
+				Sleep, 1000
+			}
+			else
+			{
+				Sleep, 1000
+			}
 	}
 }
 
-%MineShortcut%::
+!m::
 	IfWinActive, Ethermine
 	{
 		WinClose, Ethermine
@@ -41,5 +43,5 @@ Loop{
 	else
 	{
 		SetWorkingDir %MineScriptLocation%
-		Run start.bat
+		Run %MineScriptLocation%\start.bat
 	}
