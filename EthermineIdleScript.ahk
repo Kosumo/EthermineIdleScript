@@ -11,15 +11,15 @@ highgpuclock = -setBaseClockOffset:0,0,%GpuClock% -setMemoryClockOffset:0,0,%Mem
 defaultgpuclock = -setBaseClockOffset:0,0,0 -setMemoryClockOffset:0,0,0
 
 Loop{
-	IfWinExist, Ethermine
+	IfWinExist, Ethereum_Miner
 	{
 		Run %NvidiaInspectorLocation%\nvidiaInspector.exe %highgpuclock%
 		TrayTip, GpuOverclock, Overclocked
-		WinWaitClose, Ethermine
+		WinWaitClose, Ethereum_Miner
 		Run %NvidiaInspectorLocation%\nvidiaInspector.exe %defaultgpuclock%
 		Traytip, GpuOverclock, Default
 	}
-	IfWinNotExist, Ethermine
+	IfWinNotExist, Ethereum_Miner
 	{
 			if A_TimeIdlePhysical > %TimeAfkMin%
 			{
@@ -35,9 +35,9 @@ Loop{
 }
 
 !m::
-	IfWinActive, Ethermine
+	IfWinActive, Ethereum_Miner
 	{
-		WinClose, Ethermine
+		WinClose, Ethereum_Miner
 		Sleep, 1000
 	}
 	else
