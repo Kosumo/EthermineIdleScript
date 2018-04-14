@@ -27,6 +27,7 @@ IniRead, HDDWindowTitle, config.ini, HDDMining, HDDWindowTitle
 IniRead, TimeToggleShortcut, config.ini, Shortcuts, TimeToggleShortcut 
 
 SetTimer, CheckIdle, 1000
+Hotkey, %TimeToggleShortcut%, TimeToggleShortcut, On
 
 Idle := false
 CheckIdle:
@@ -36,6 +37,7 @@ CheckIdle:
 		{
 			Msgbox idle
 			Idle:= true
+			Gosub, MineScripts
 		}
 	}
 	else
@@ -47,7 +49,7 @@ return
 
 TimeToggle := false
 TimeToggleShortcut:
-	if (toggle= false)
+	if (TimeToggle= false)
 	{
 		TimeToggle := true
 		Msgbox Idle timer on
@@ -62,22 +64,11 @@ return
 MineScripts:
 	if (TimeToggle=true) && (Idle=true)
 	{
-		Msgbox werkt
-		IfWinActive, %GPUWindowTitle% 
-		{
-			WinClose, %GPUWindowTitle%
-			WinClose, %CPUWindowTitle%
-			WinClose, %HDDWindowTitle%
-			Sleep, 1000
-		}
-		else 
-		{
 		SetWorkingDir %GPUMineDir%
 		Run %GPUMineScript%
 		SetWorkingDir %CPUMineDir%
 		Run %CPUMineScript%
 		SetWorkingDir %HDDMineDir%
 		Run %HDDMineScript%
-		}
 	}
 return
