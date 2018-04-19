@@ -23,19 +23,23 @@ IniRead, HDDMineDir, config.ini, HDDMining, HDDMineDir
 IniRead, HDDMineScript, config.ini, HDDMining, HDDMineScript
 IniRead, HDDWindowTitle, config.ini, HDDMining, HDDWindowTitle
 
+;Time
+IniRead, TimeIdle, config.ini, TimeIdle, TimeIdle
+
 ;Shortcuts
 IniRead, TimeToggleShortcut, config.ini, Shortcuts, TimeToggleShortcut 
 
-SetTimer, CheckIdle, 1000
+TimeIdleMin := TimeIdle * 6000
 Hotkey, %TimeToggleShortcut%, TimeToggleShortcut, On
+SetTimer, CheckIdle, 1000
+
 
 Idle := false
 CheckIdle:
-	if (A_TimeIdlePhysical > 5000)
+	if A_TimeIdlePhysical > %TimeIdleMin%
 	{
 		if (Idle= false)
 		{
-			Msgbox idle
 			Idle:= true
 			Gosub, MineScripts
 		}
@@ -52,12 +56,12 @@ TimeToggleShortcut:
 	if (TimeToggle= false)
 	{
 		TimeToggle := true
-		Msgbox Idle timer on
+		Traytip, , Idle timer On, 5
 	}
 	else
 	{
 		TimeToggle := false
-		Msgbox Idle timer off
+		Traytip, , Idle timer Off, 5
 	}
 return
 	
@@ -72,3 +76,6 @@ MineScripts:
 		Run %HDDMineScript%
 	}
 return
+
+MineScriptShortcut:
+	
