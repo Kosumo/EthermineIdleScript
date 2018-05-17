@@ -8,6 +8,7 @@ IniRead, GPUMineScript, config.ini, GPUMining, GPUMineScript
 IniRead, GPUWindowTitle, config.ini, GPUMining, GPUWindowTitle
 
 ;GPUOverclock
+IniRead, Overclock, config.ini, Overclock, Overclock
 IniRead, NvidiaInspectorLocation, config.ini, Overclock, NvidiaInspectorLocation
 IniRead, GpuClockOffset, config.ini, Overclock, GpuClockOffset
 IniRead, MemClockOffset, config.ini, Overclock, MemClockOffset
@@ -29,12 +30,16 @@ IniRead, TimeIdle, config.ini, TimeIdle, TimeIdle
 ;Shortcuts
 IniRead, TimeToggleShortcut, config.ini, Shortcuts, TimeToggleShortcut
 IniRead, MineScriptShortcut, config.ini, Shortcuts, MineScriptShortcut
+IniRead, CloseShortcut, config.ini, Shortcuts, CloseShortcut
 
+TimeToggle := true
 TimeIdleMin := TimeIdle * 60000
 Hotkey, %TimeToggleShortcut%, TimeToggleShortcut, On
 Hotkey, %MineScriptShortcut%, MineScriptShortcut, On
-
+Hotkey, %CloseShortcut%, CloseShortcut, On
 SetTimer, CheckIdle, 1000
+
+
 Idle := false
 CheckIdle:
 	if A_TimeIdlePhysical > %TimeIdleMin%
@@ -42,7 +47,7 @@ CheckIdle:
 		if (Idle= false)
 		{
 			Idle:= true
-			Gosub, MineScripts
+			Gosub, TimeAndToggle
 		}
 	}
 	else
@@ -52,7 +57,6 @@ CheckIdle:
 	}
 return
 
-TimeToggle := false
 TimeToggleShortcut:
 	if (TimeToggle= false)
 	{
@@ -65,16 +69,36 @@ TimeToggleShortcut:
 		Traytip, , Idle timer Off, 5
 	}
 return
-	
-MineScripts:
-	if (TimeToggle=true) && (Idle=true)
+
+TimeAndToggle:
+	if (TimeToggle=true) && (Idle=true) 
 	{
-		SetWorkingDir %GPUMineDir%
-		Run %GPUMineScript%
-		SetWorkingDir %CPUMineDir%
-		Run %CPUMineScript%
-		SetWorkingDir %HDDMineDir%
-		Run %HDDMineScript%
+		If WinExist(GPUWindowTitle) or WinExist(CPUWindowTitle) or WinExist(HDDWindowTitle)
+		{
+			return
+		}
+		else
+		{
+			Gosub, MineScripts
+		}
 	}
 return
 
+MineScriptShortcut:
+	Gosub, MineScripts
+return
+
+MineScripts:
+	SetWorkingDir %GPUMineDir%
+	Run %GPUMineScript%
+	SetWorkingDir %CPUMineDir%
+	Run %CPUMineScript%
+	SetWorkingDir %HDDMineDir%
+	Run %HDDMineScript%
+return
+
+CloseShortcut:
+	WinClose, %GPUWindowTitle%
+	WinClose, %CPUWindowTitle%
+	WinClose, %HDDWindowTitle%
+return
